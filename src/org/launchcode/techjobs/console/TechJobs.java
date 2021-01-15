@@ -2,6 +2,7 @@ package org.launchcode.techjobs.console;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Scanner;
  */
 public class TechJobs {
 
-    private static Scanner in = new Scanner(System.in);
+    private static final Scanner in = new Scanner(System.in);
 
     public static void main (String[] args) {
 
@@ -29,6 +30,7 @@ public class TechJobs {
         System.out.println("Welcome to LaunchCode's TechJobs App!");
 
         // Allow the user to search until they manually quit
+        //prompts the user to select to search/list and then by all/position/employer/location/skill
         while (true) {
 
             String actionChoice = getUserSelection("View jobs by:", actionChoices);
@@ -36,22 +38,24 @@ public class TechJobs {
             if (actionChoice.equals("list")) {
 
                 String columnChoice = getUserSelection("List", columnChoices);
-
+                //returns list/all
                 if (columnChoice.equals("all")) {
                     printJobs(JobData.findAll());
-                } else {
 
+                } else {
+                    // list/column choice
                     ArrayList<String> results = JobData.findAll(columnChoice);
 
                     System.out.println("\n*** All " + columnChoices.get(columnChoice) + " Values ***");
 
-                    // Print list of skills, employers, etc
+                    // Print list of skills, employers, etc SORTED
+                    results.sort(String::compareToIgnoreCase);
                     for (String item : results) {
                         System.out.println(item);
                     }
                 }
 
-            } else { // choice is "search"
+            } else { // choice is "search" and it is by column
 
                 // How does the user want to search (e.g. by skill or employer)
                 String searchField = getUserSelection("Search by:", columnChoices);
@@ -61,7 +65,8 @@ public class TechJobs {
                 String searchTerm = in.nextLine();
 
                 if (searchField.equals("all")) {
-                    System.out.println("Search all fields not yet implemented.");
+                    // System.out.println("Search all fields not yet implemented.");
+                    printJobs(JobData.findByValue(searchTerm));
                 } else {
                     printJobs(JobData.findByColumnAndValue(searchField, searchTerm));
                 }
@@ -69,6 +74,9 @@ public class TechJobs {
         }
     }
 
+
+
+    // this section verifies that the user chooses an appropriate choice after filter/list
     // ﻿Returns the key of the selected item from the choices Dictionary
     private static String getUserSelection(String menuHeader, HashMap<String, String> choices) {
 
@@ -89,6 +97,7 @@ public class TechJobs {
             System.out.println("\n" + menuHeader);
 
             // Print available choices
+            //view jobs by: section
             for (Integer j = 0; j < choiceKeys.length; j++) {
                 System.out.println("" + j + " - " + choices.get(choiceKeys[j]));
             }
@@ -108,9 +117,20 @@ public class TechJobs {
         return choiceKeys[choiceIdx];
     }
 
+
+
     // Print a list of jobs
     private static void printJobs(ArrayList<HashMap<String, String>> someJobs) {
-
-        System.out.println("printJobs is not implemented yet");
+          if(someJobs.size()==0){
+              System.out.println("sorry no results for that search");
+          }else {
+              for (HashMap<String, String> someJob : someJobs) {
+                  System.out.println("*****");
+                  for (Map.Entry<String, String> i : someJob.entrySet()) {
+                      System.out.println(i.getKey() + ": " + i.getValue());
+                  }
+                  System.out.println("*****\n");
+              }
+          }
     }
 }

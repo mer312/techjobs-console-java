@@ -10,12 +10,14 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+//import java.util.Map;
 
 /**
  * Created by LaunchCode
  */
-public class JobData {
 
+public class JobData {
+    //*** builds the Data File to be searched
     private static final String DATA_FILE = "resources/job_data.csv";
     private static Boolean isDataLoaded = false;
 
@@ -28,6 +30,8 @@ public class JobData {
      * @param field The column to retrieve values from
      * @return List of all of the values of the given field
      */
+
+    //***find all fields containing the searchable String
     public static ArrayList<String> findAll(String field) {
 
         // load data, if not already loaded
@@ -42,16 +46,17 @@ public class JobData {
                 values.add(aValue);
             }
         }
-
         return values;
     }
 
+    //***returns everything
     public static ArrayList<HashMap<String, String>> findAll() {
-
         // load data, if not already loaded
         loadData();
 
-        return allJobs;
+        ArrayList<HashMap<String, String>> secondList = (ArrayList<HashMap<String, String>>)allJobs.clone();
+
+        return secondList;
     }
 
     /**
@@ -62,9 +67,11 @@ public class JobData {
      * with "Enterprise Holdings, Inc".
      *
      * @param column   Column that should be searched.
-     * @param value Value of teh field to search for
+     * @param value Value of the field to search for
      * @return List of all jobs matching the criteria
      */
+
+    //***finds only values matching the search value withing the column of choice
     public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
 
         // load data, if not already loaded
@@ -76,13 +83,33 @@ public class JobData {
 
             String aValue = row.get(column);
 
-            if (aValue.contains(value)) {
+            if (aValue.toLowerCase().contains(value.toLowerCase())) {
                 jobs.add(row);
             }
         }
 
         return jobs;
     }
+    //***finds all values matching the search value
+    public static  ArrayList<HashMap<String, String>> findByValue(String value){
+
+        // load data, if not already loaded
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> alljob : allJobs) {
+
+            for(String i : alljob.values()){
+                if(i.toLowerCase().contains(value.toLowerCase()) ){
+                    jobs.add(alljob);
+                    break;
+                }
+            }
+        }
+        return jobs;
+    }
+
 
     /**
      * Read in data from a CSV file and store it in a list
@@ -96,7 +123,7 @@ public class JobData {
 
         try {
 
-            // Open the CSV file and set up pull out column header info and records
+            // Open the CSV file and set up --pull out column header info and records
             Reader in = new FileReader(DATA_FILE);
             CSVParser parser = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
             List<CSVRecord> records = parser.getRecords();
@@ -124,5 +151,4 @@ public class JobData {
             e.printStackTrace();
         }
     }
-
 }
